@@ -1,0 +1,116 @@
+cmake_minimum_required(VERSION 3.0.0)
+project(VisualConstruct VERSION 0.0.1)
+
+# Set default build type
+if(NOT CMAKE_BUILD_TYPE)
+    set(CMAKE_BUILD_TYPE Release)
+endif(NOT CMAKE_BUILD_TYPE)
+
+# Set constants
+set(SHADE_PROJECT_NAME Shade)
+set(BASIC_PROJECT_NAME Basic)
+# Platform specific for definitions
+if(WIN32)
+    set(CMAKE_FOLDER_NAME "Build_Win64")
+elseif(UNIX)
+    set(CMAKE_FOLDER_NAME "Build_Unix64")
+elseif(APPLE)
+    set(CMAKE_FOLDER_NAME "Build_Apple64")
+else()
+    # Cmake will close if acceptable platform not found
+    message(FATAL_ERROR "PLATFORM ERROR: Can't find acceptable platform")
+endif()
+
+# Check if the cmake is called in the correct directory
+get_filename_component(CMAKE_PROJECT_DIRECTORY_CURRENT "${CMAKE_BINARY_DIR}" NAME)
+if(NOT "${CMAKE_PROJECT_DIRECTORY_CURRENT}" MATCHES ${CMAKE_FOLDER_NAME})
+    message(FATAL_ERROR "BUILD ERROR: not in ${CMAKE_FOLDER_NAME}")
+endif()
+
+# Platform messages
+message(STATUS "Building Project: ${PROJECT_NAME} ${CMAKE_SYSTEM_NAME} ${VERSION}")
+
+# Setting output directory
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
+
+# Definitions
+# GLFW
+set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
+set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+set(GLFW_VULKAN_STATIC ON CACHE BOOL "" FORCE)
+#GLM
+set(GLM_TEST_ENABLE OFF CACHE BOOL "" FORCE)
+
+
+#Windows
+set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS 1)
+
+# Include source directorys
+set(SHADE_SOURCE_DIRECTORIES ${PROJECT_SOURCE_DIR}/Shade/src/Shade.h)
+
+# Get all shared library source files
+file(GLOB_RECURSE SHADE_SOURCE_LIST ${PROJECT_SOURCE_DIR}/Shade/src/*)
+
+# Dependeny subdirectory project
+add_subdirectory(${PROJECT_SOURCE_DIR}/Shade/deps/glfw)
+add_subdirectory(${PROJECT_SOURCE_DIR}/Shade/deps/glm)
+
+# Create shared library
+add_library(${SHADE_PROJECT_NAME}  SHARED ${SHADE_SOURCE_LIST})
+set_target_properties(${SHADE_PROJECT_NAME}  PROPERTIES LINKER_LANGUAGE CXX)
+# Dependecy includes
+target_include_directories(${SHADE_PROJECT_NAME}  PUBLIC ${PROJECT_SOURCE_DIR}/Shade/deps/spdlog/include)
+target_include_directories(${SHADE_PROJECT_NAME}  PUBLIC ${PROJECT_SOURCE_DIR}/Shade/deps/vulkan/include)
+target_include_directories(${SHADE_PROJECT_NAME}  PUBLIC ${PROJECT_SOURCE_DIR}/Shade/deps/bullet3/include)
+
+
+
+# Platform specific for definitions
+if(WIN32)
+    target_compile_definitions(${SHADE_PROJECT_NAME} PRIVATE SHD_PLATFORM_WINDOWS SHD_BUILD_DLL)
+elseif(UNIX)
+    target_compile_definitions(${SHADE_PROJECT_NAME} PRIVATE SHD_PLATFORM_UNIX SHD_BUILD_DLL)
+elseif(APPLE)
+    target_compile_definitions(${SHADE_PROJECT_NAME} PRIVATE SHD_PLATFORM_APPLE SHD_BUILD_DLL)
+endif()
+
+# Debug definitons
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    target_compile_definitions(${SHADE_PROJECT_NAME} PRIVATE SHD_DEBUG)
+endif()
+
+# Create application
+add_executable(${BASIC_PROJECT_NAME}  ${PROJECT_SOURCE_DIR}/Examples/Basic/src/Basic.cpp)
+target_include_directories(${BASIC_PROJECT_NAME}  PUBLIC ${PROJECT_SOURCE_DIR}/Shade/src)
+target_include_directories(${BASIC_PROJECT_NAME}  PUBLIC ${PROJECT_SOURCE_DIR}/Shade/deps/spdlog/include)
+
+# Linking Libraries
+target_link_libraries(${BASIC_PROJECT_NAME}  ${SHADE_PROJECT_NAME})
+# Dependency Library
+find_library(VULKAN_LIB vulkan-1.lib PATHS ${PROJECT_SOURCE_DIR}/Shade/deps/vulkan/lib)
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(BULLET3_LIB_DEBUG ${PROJECT_SOURCE_DIR}/Shade/deps/bullet3/lib/Debug)
+    target_link_libraries(${SHADE_PROJECT_NAME} ${BULLET3_LIB_DEBUG}/LinearMath_Debug.lib ${BULLET3_LIB_DEBUG}/BulletDynamics_Debug.lib ${BULLET3_LIB_DEBUG}/BulletCollision_Debug.lib)
+else()
+    set(BULLET3_LIB_RELEASE ${PROJECT_SOURCE_DIR}/Shade/deps/bullet3/lib/Release)
+    target_link_libraries(${SHADE_PROJECT_NAME} ${BULLET3_LIB_RELEASE}/LinearMath.lib ${BULLET3_LIB_RELEASE}/BulletDynamics.lib ${BULLET3_LIB_RELEASE}/BulletCollision.lib)
+endif()
+target_link_libraries(${SHADE_PROJECT_NAME} glfw glm ${VULKAN_LIB} )
+
+
+# Platform specific for definitions
+if(WIN32)
+    target_compile_definitions(${BASIC_PROJECT_NAME}  PRIVATE SHD_PLATFORM_WINDOWS)
+elseif(UNIX)
+    target_compile_definitions(${BASIC_PROJECT_NAME}  PRIVATE SHD_PLATFORM_UNIX)
+elseif(APPLE)
+    target_compile_definitions(${BASIC_PROJECT_NAME}  PRIVATE SHD_PLATFORM_APPLE)
+endif()
+
+# Debug definitons
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    target_compile_definitions(${BASIC_PROJECT_NAME} PRIVATE SHD_DEBUG)
+endif()

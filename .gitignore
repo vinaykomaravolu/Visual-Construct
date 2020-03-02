@@ -1,0 +1,8 @@
+# Directories
+.vs/
+bin/
+Build_Win64_Dbg/
+
+# Files
+*.user
+settings.json
