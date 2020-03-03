@@ -2,6 +2,8 @@
 .vs/
 bin/
 Build_Win64_Dbg/
+Build_Win64_Rel/
+out/
 
 # Files
 *.user
