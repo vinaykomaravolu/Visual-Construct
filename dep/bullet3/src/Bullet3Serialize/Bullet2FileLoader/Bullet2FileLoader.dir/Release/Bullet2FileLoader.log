@@ -1,0 +1,8 @@
+﻿  Building Custom Rule C:/Users/redzo/Downloads/bullet3-2.89/bullet3-2.89/src/Bullet3Serialize/Bullet2FileLoader/CMakeLists.txt
+  b3BulletFile.cpp
+  b3Chunk.cpp
+  b3DNA.cpp
+  b3File.cpp
+  b3Serializer.cpp
+  Generating Code...
+  Bullet2FileLoader.vcxproj -> C:\Users\redzo\Downloads\bullet3-2.89\bullet3-2.89\lib\Release\Bullet2FileLoader.lib

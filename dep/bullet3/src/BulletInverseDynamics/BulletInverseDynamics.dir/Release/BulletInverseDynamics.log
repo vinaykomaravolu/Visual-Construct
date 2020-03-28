@@ -1,0 +1,7 @@
+﻿  Building Custom Rule C:/Users/redzo/Downloads/bullet3-2.89/bullet3-2.89/src/BulletInverseDynamics/CMakeLists.txt
+  IDMath.cpp
+  MultiBodyTree.cpp
+  MultiBodyTreeInitCache.cpp
+  MultiBodyTreeImpl.cpp
+  Generating Code...
+  BulletInverseDynamics.vcxproj -> C:\Users\redzo\Downloads\bullet3-2.89\bullet3-2.89\lib\Release\BulletInverseDynamics.lib

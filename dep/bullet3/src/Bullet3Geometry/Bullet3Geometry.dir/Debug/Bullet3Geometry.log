@@ -1,0 +1,5 @@
+﻿  Building Custom Rule C:/Users/redzo/Downloads/bullet3-2.89/bullet3-2.89/src/Bullet3Geometry/CMakeLists.txt
+  b3ConvexHullComputer.cpp
+  b3GeometryUtil.cpp
+  Generating Code...
+  Bullet3Geometry.vcxproj -> C:\Users\redzo\Downloads\bullet3-2.89\bullet3-2.89\lib\Debug\Bullet3Geometry_Debug.lib

@@ -1,0 +1,10 @@
+^C:\USERS\REDZO\DOWNLOADS\BULLET3-2.89\BULLET3-2.89\SRC\LINEARMATH\CMAKELISTS.TXT
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SC:/Users/redzo/Downloads/bullet3-2.89/bullet3-2.89 -BC:/Users/redzo/Downloads/bullet3-2.89/bullet3-2.89 --check-stamp-file C:/Users/redzo/Downloads/bullet3-2.89/bullet3-2.89/src/LinearMath/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
