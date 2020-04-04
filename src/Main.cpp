@@ -1,4 +1,4 @@
-#include <Log.h>
+#include <log.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -11,14 +11,18 @@
 #include <glm/mat4x4.hpp>
 #include <btBulletDynamicsCommon.h>
 #include <iostream>
+#include <oglRenderer.h>
 
-int main() {
+int main()
+{
     // Vulkan Test
     uint32_t extensionCount = 0;
-    if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) == VK_SUCCESS) 
+    if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) != VK_SUCCESS)
     {
-        VC_LOG_CORE_INFO("Vulkan Test: Pass");
+        VC_LOG_VULKAN_ERROR("Vulkan Test: Failed");
+        return 0;
     }
+    VC_LOG_VULKAN_INFO("Vulkan Test: Pass");
 
     // GLM Test
     glm::mat4 matrix;
@@ -27,41 +31,38 @@ int main() {
     VC_LOG_CORE_INFO("GLM Test: Pass");
 
     // GLFW Test
-    if (!glfwInit()) 
+    if (!glfwInit())
     {
-        std::cout << "Failed to initialize GLFW" << std::endl;
-        return -1;
+        VC_LOG_CLIENT_ERROR("GLFW Test: Failed");
+        return 0;
     }
-    else 
-    {
-        VC_LOG_CORE_INFO("GLFW Test: Pass");
-    }
+    VC_LOG_CORE_INFO("GLFW Test: Pass");
 
-    GLFWwindow* window = glfwCreateWindow(800, 600, "Visual Construct", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1920, 1080, "Visual Construct", nullptr, nullptr);
 
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
     // Glad Test
-    if (!gladLoadGL()) 
+    if (!gladLoadGL())
     {
-        std::cout << "Failed to initialize GLAD" << std::endl;
-        return -1;
+        VC_LOG_OPENGL_ERROR("GLAD Test: Failed");
+        return 0;
     }
-    else 
-    {
-        VC_LOG_CORE_INFO("GLAD Test: Pass");
-    }
+    VC_LOG_OPENGL_INFO("GLAD Test: Pass");
 
     // IMGUI Test
-    IMGUI_CHECKVERSION();
+    if (!IMGUI_CHECKVERSION())
+    {
+        VC_LOG_CLIENT_ERROR("Imgui Test: Failed");
+        return 0;
+    }
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
-
-    VC_LOG_CORE_INFO("Imgui Test: Pass");
+    VC_LOG_CLIENT_INFO("Imgui Test: Pass");
 
     // Our state
     bool show_demo_window = true;
@@ -69,9 +70,10 @@ int main() {
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // OpenGL Test  
-    VC_LOG_CORE_INFO("OpenGL Test: Pass");
+    VC_LOG_OPENGL_INFO("OpenGL Test: Pass");
 
     // Bullet Physics Test
+
     btDefaultCollisionConfiguration* collisionConfiguration = new
         btDefaultCollisionConfiguration();
 
@@ -144,15 +146,15 @@ int main() {
     }
 
 
-    for (int i = 0; i < 100; i++) 
+    for (int i = 0; i < 100; i++)
     {
-        dynamicsWorld->stepSimulation(1.f / 60.f,10);
+        dynamicsWorld->stepSimulation(1.f / 60.f, 10);
         for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j > 0; j--)
         {
             btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
             btRigidBody* body = btRigidBody::upcast(obj);
             btTransform trans;
-            if (body && body->getMotionState()) 
+            if (body && body->getMotionState())
             {
                 body->getMotionState()->getWorldTransform(trans);
             }
@@ -202,6 +204,10 @@ int main() {
     //next line is optional: it will be cleared by the destructor when the array goes out of scope
     collisionShapes.clear();
     VC_LOG_CORE_INFO("Bullet3 Test: Pass");
+
+    // RENDERER
+    Renderer* renderer = new OglRenderer;
+    VC_LOG_RENDERER_INFO("Renderer Test: Pass");
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -255,6 +261,20 @@ int main() {
             ImGui::End();
         }
 
+        ImGui::Begin("Rendered Scene");
+        ImVec2 pos = ImGui::GetCursorScreenPos();
+        renderer->render(1080,1920);
+        ImTextureID textureID;
+        renderer->getRender(&textureID);
+        ImGui::GetWindowDrawList()->AddImage(
+            textureID, 
+            ImVec2(ImGui::GetCursorScreenPos()),
+            ImVec2(ImGui::GetCursorScreenPos().x + 1920 / 2, ImGui::GetCursorScreenPos().y + 1080 / 2),
+            ImVec2(0, 1), 
+            ImVec2(1, 0));
+        ImGui::End();
+
+
         // Rendering
         ImGui::Render();
         int display_w, display_h;
@@ -274,5 +294,5 @@ int main() {
     glfwDestroyWindow(window);
     glfwTerminate();
 
-    return 0;
+    return 1;
 }

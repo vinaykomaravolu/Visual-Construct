@@ -3,27 +3,34 @@
 #include "spdlog/spdlog.h"
 #include "spdlog/sinks/stdout_color_sinks.h"
 
-class VCLog {
+class VCLog 
+{
 public:
-	static std::shared_ptr<spdlog::logger>& GetCoreLogger() {
+	static std::shared_ptr<spdlog::logger>& GetCoreLogger() 
+	{
 		return s_CoreLogger;
 	};
 
-	static std::shared_ptr<spdlog::logger>& GetClientLogger() {
+	static std::shared_ptr<spdlog::logger>& GetClientLogger() 
+	{
 		return s_ClientLogger;
 	};
 
-	static std::shared_ptr<spdlog::logger>& GetRendererLogger() {
+	static std::shared_ptr<spdlog::logger>& GetRendererLogger() 
+	{
 		return s_RendererLogger;
 	};
 
-	static std::shared_ptr<spdlog::logger>& GetVulkanLogger() {
+	static std::shared_ptr<spdlog::logger>& GetVulkanLogger() 
+	{
 		return s_VulkanLogger;
 	};
 
-	static std::shared_ptr<spdlog::logger>& GetOpenglLogger() {
+	static std::shared_ptr<spdlog::logger>& GetOpenglLogger() 
+	{
 		return s_OpenglLogger;
 	};
+
 private:
 	static bool Init();
 	static std::shared_ptr<spdlog::logger> s_CoreLogger;

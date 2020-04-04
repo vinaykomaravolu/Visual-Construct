@@ -5,3 +5,4 @@ cd ..
 mkdir Build_Win64_Rel
 cd Build_Win64_Rel
 cmake -DCMAKE_GENERATOR_PLATFORM=x64 -DCMAKE_BUILD_TYPE=Release ..
+cd ..
