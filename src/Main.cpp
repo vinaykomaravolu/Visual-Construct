@@ -1,18 +1,11 @@
-#include <log.h>
+#include <visualconstruct.h>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include <imgui_impl_vulkan.h>
-#include <glad/glad.h>
-#include <GLFW/glfw3.h>
-#include <vulkan.h>
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/vec4.hpp>
-#include <glm/mat4x4.hpp>
-#include <btBulletDynamicsCommon.h>
-#include <iostream>
-#include <oglRenderer.h>
+
+
+using namespace VisualConstruct;
 
 int main()
 {
@@ -70,145 +63,29 @@ int main()
     bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
-    // OpenGL Test  
-    VC_LOG_OPENGL_INFO("OpenGL Test: Pass");
-
-    // Bullet Physics Test
-
-    btDefaultCollisionConfiguration* collisionConfiguration = new
-        btDefaultCollisionConfiguration();
-
-    btCollisionDispatcher* dispatcher = new btCollisionDispatcher(collisionConfiguration);
-
-    btBroadphaseInterface* overlappingPairCache = new btDbvtBroadphase(); // btAxis3Sweep
-
-    btSequentialImpulseConstraintSolver* solver = new btSequentialImpulseConstraintSolver;
-
-    btDiscreteDynamicsWorld* dynamicsWorld = new btDiscreteDynamicsWorld(dispatcher,
-        overlappingPairCache, solver, collisionConfiguration);
-
-    dynamicsWorld->setGravity(btVector3(0, -10, 0));
-
-    btAlignedObjectArray<btCollisionShape*> collisionShapes;
-
-    {
-        btCollisionShape* groundShape = new btBoxShape(btVector3(btScalar(50.), btScalar(50.), btScalar(50.)));
-
-        collisionShapes.push_back(groundShape);
-
-        btTransform groundTransform;
-        groundTransform.setIdentity();
-        groundTransform.setOrigin(btVector3(0, -56, 0));
-
-        btScalar mass(0.);
-
-        //rigidbody is dynamic if and only if mass is non zero, otherwise static
-        bool isDynamic = (mass != 0.f);
-
-        btVector3 localInertia(0, 0, 0);
-        if (isDynamic)
-            groundShape->calculateLocalInertia(mass, localInertia);
-
-        //using motionstate is optional, it provides interpolation capabilities, and only synchronizes 'active' objects
-        btDefaultMotionState* myMotionState = new btDefaultMotionState(groundTransform);
-        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, groundShape, localInertia);
-        btRigidBody* body = new btRigidBody(rbInfo);
-
-        //add the body to the dynamics world
-        dynamicsWorld->addRigidBody(body);
-    }
-
-    {
-        //create a dynamic rigidbody
-
-        btCollisionShape* colShape = new btSphereShape(btScalar(1.));
-        collisionShapes.push_back(colShape);
-
-        /// Create Dynamic Objects
-        btTransform startTransform;
-        startTransform.setIdentity();
-        startTransform.setOrigin(btVector3(2, 10, 0));
-
-        btScalar mass(1.f);
-
-        //rigidbody is dynamic if and only if mass is non zero, otherwise static
-        bool isDynamic = (mass != 0.f);
-
-        btVector3 localInertia(0, 0, 0);
-        if (isDynamic)
-            colShape->calculateLocalInertia(mass, localInertia);
-
-        //using motionstate is recommended, it provides interpolation capabilities, and only synchronizes 'active' objects
-        btDefaultMotionState* myMotionState = new btDefaultMotionState(startTransform);
-        btRigidBody::btRigidBodyConstructionInfo rbInfo(mass, myMotionState, colShape, localInertia);
-        btRigidBody* body = new btRigidBody(rbInfo);
-
-        dynamicsWorld->addRigidBody(body);
-    }
-
-
+    
+    // Storage Test
+ 
+    StorageDynamic<int> storage(10);
     for (int i = 0; i < 100; i++)
     {
-        dynamicsWorld->stepSimulation(1.f / 60.f, 10);
-        for (int j = dynamicsWorld->getNumCollisionObjects() - 1; j > 0; j--)
-        {
-            btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[j];
-            btRigidBody* body = btRigidBody::upcast(obj);
-            btTransform trans;
-            if (body && body->getMotionState())
-            {
-                body->getMotionState()->getWorldTransform(trans);
-            }
-            else
-            {
-                trans = obj->getWorldTransform();
-            }
-            printf("world pos object %d = %f,%f,%f\n", j, float(trans.getOrigin().getX()), float(trans.getOrigin().getY()), float(trans.getOrigin().getZ()));
-
-        }
+        auto item_index = storage.allocateItem();
+        int* item = storage.getItem(item_index);
+        *item = i;
     }
-    // remove the rigidbodies from the dynamics world and delete them
-    for (int i = dynamicsWorld->getNumCollisionObjects() - 1; i >= 0; i--)
+
+    for (int i = 0; i < 20; i++)
     {
-        btCollisionObject* obj = dynamicsWorld->getCollisionObjectArray()[i];
-        btRigidBody* body = btRigidBody::upcast(obj);
-        if (body && body->getMotionState())
-        {
-            delete body->getMotionState();
-        }
-        dynamicsWorld->removeCollisionObject(obj);
-        delete obj;
+        storage.freeItem(i * 2);
     }
 
-    //delete collision shapes
-    for (int j = 0; j < collisionShapes.size(); j++)
+    for (int i = 0; i < 15; i++)
     {
-        btCollisionShape* shape = collisionShapes[j];
-        collisionShapes[j] = 0;
-        delete shape;
+        auto item_index = storage.allocateItem();
+        int* item = storage.getItem(item_index);
+        *item = i;
     }
-
-    //delete dynamics world
-    delete dynamicsWorld;
-
-    //delete solver
-    delete solver;
-
-    //delete broadphase
-    delete overlappingPairCache;
-
-    //delete dispatcher
-    delete dispatcher;
-
-    delete collisionConfiguration;
-
-    //next line is optional: it will be cleared by the destructor when the array goes out of scope
-    collisionShapes.clear();
-    VC_LOG_CORE_INFO("Bullet3 Test: Pass");
-
-    // RENDERER
-    Renderer* renderer = new OglRenderer;
-    VC_LOG_RENDERER_INFO("Renderer Test: Pass");
+    auto item_index = storage.allocateItem();
 
     // Main loop
     while (!glfwWindowShouldClose(window))
@@ -262,6 +139,7 @@ int main()
             ImGui::End();
         }
 
+        /*
         ImGui::Begin("Rendered Scene");
         ImVec2 pos = ImGui::GetCursorScreenPos();
         renderer->render(1080,1920);
@@ -274,7 +152,7 @@ int main()
             ImVec2(0, 1), 
             ImVec2(1, 0));
         ImGui::End();
-
+        */
 
         // Rendering
         ImGui::Render();

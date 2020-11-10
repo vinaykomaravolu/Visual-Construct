@@ -1,18 +1,20 @@
 #pragma once
-#include <log.h>
-#include <glad/glad.h>
-#include "renderer.h";
+#include <internal.h>
+#include <renderer.h>
 
-class OglRenderer: public Renderer
+namespace VisualConstruct
 {
-public:
-	OglRenderer();
-	~OglRenderer();
-	void render();
-	void render(int height, int width);
-	void getRender(void** renderedTextureID);
-private:
-	GLuint frameBuffer;
-	GLuint renderedTexture;
-	GLuint renderBuffer;
-};
+	class OglRenderer: public Renderer
+	{
+	public:
+		OglRenderer();
+		~OglRenderer();
+		void render();
+		void render(int height, int width);
+		void getRender(void** renderedTextureID);
+	private:
+		GLuint frameBuffer;
+		GLuint renderedTexture;
+		GLuint renderBuffer;
+	};
+}
