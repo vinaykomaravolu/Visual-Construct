@@ -66,26 +66,64 @@ int main()
     
     // Storage Test
  
-    StorageDynamic<int> storage(10);
-    for (int i = 0; i < 100; i++)
+    StorageDynamic<int> storage(5);
+    for (int i = 0; i < 1000; i++)
     {
         auto item_index = storage.allocateItem();
         int* item = storage.getItem(item_index);
         *item = i;
     }
+ 
 
-    for (int i = 0; i < 20; i++)
+    for (int i = 0; i < 1000; i++)
     {
-        storage.freeItem(i * 2);
+        storage.freeItem(i);
     }
 
-    for (int i = 0; i < 15; i++)
+    for (int i = 0; i < 1000; i++)
     {
         auto item_index = storage.allocateItem();
-        int* item = storage.getItem(item_index);
+        int* item = storage.getItem(i);
         *item = i;
     }
-    auto item_index = storage.allocateItem();
+
+    for (int i = 0; i < 1000; i++)
+    {
+        int* item = storage.getItem(i);
+        if (i != *item){
+            VC_LOG_CORE_ERROR("Storage Dynamic Fail");
+        }
+    }
+
+    StorageStatic<int> storageS(1000);
+    for (int i = 0; i < 1000; i++)
+    {
+        auto item_index = storageS.allocateItem();
+        int* item = storageS.getItem(item_index);
+        *item = i;
+    }
+
+
+    for (int i = 0; i < 1000; i++)
+    {
+        storageS.freeItem(i);
+    }
+
+    for (int i = 0; i < 1000; i++)
+    {
+        auto item_index = storageS.allocateItem();
+        int* item = storageS.getItem(i);
+        *item = i;
+    }
+
+    for (int i = 0; i < 1000; i++)
+    {
+        int* item = storageS.getItem(i);
+        if (i != *item) {
+            VC_LOG_CORE_ERROR("Storage Static Fail");
+        }
+    }
+   
 
     // Main loop
     while (!glfwWindowShouldClose(window))

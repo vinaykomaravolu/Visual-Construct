@@ -1,5 +1,4 @@
 #include <storage.h>
-#include <entityManager.h>
 
 namespace VisualConstruct
 {
@@ -23,7 +22,7 @@ namespace VisualConstruct
 			storageBuffers.push_back(std::vector<item_t<T>>(segmentSize));
 		}
 
-		if (storageBuffers[freeSlot / segmentSize][freeSlot % segmentSize].next_free == 0)
+		if (storageBuffers[freeSlot / segmentSize][freeSlot % segmentSize].next_free == -1)
 		{
 			next_free = freeSlot + 1;
 		}
@@ -73,7 +72,7 @@ namespace VisualConstruct
 	{
 		assert(allocatedItems <= maxSize);
 		uint32_t freeSlot = next_free;
-		if (storageBuffers[freeSlot].next_free == 0)
+		if (storageBuffers[freeSlot].next_free == -1)
 		{
 			next_free = freeSlot + 1;
 		}
@@ -109,6 +108,8 @@ namespace VisualConstruct
 		return allocatedItems;
 	}
 
+	// Explicit definitions
+	//template struct item_t<int>;
     template class StorageStatic<int>;
     template class StorageDynamic<int>;
 }
