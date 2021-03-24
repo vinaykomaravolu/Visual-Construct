@@ -9,3 +9,5 @@ out/
 # Files
 *.user
 settings.json
+act.exe
+.actrc
