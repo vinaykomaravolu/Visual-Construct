@@ -2,7 +2,7 @@
 
 namespace VisualConstruct
 {
-    Physics::Physics()
+    /*Physics::Physics()
     {
         collisionConfiguration = new btDefaultCollisionConfiguration();
         dispatcher = new btCollisionDispatcher(collisionConfiguration);
@@ -145,5 +145,5 @@ namespace VisualConstruct
             collisionShapes[j] = 0;
             delete shape;
         }
-    }
+    }*/
 }

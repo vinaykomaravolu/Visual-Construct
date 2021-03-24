@@ -15,7 +15,8 @@
 #include <bitset>
 
 #include <storage.h>
-
+#include <renderer.h>
+#include <oglRenderer.h>
 
 #define MAX_ENTITIES 8192
 #define MAX_COMPONENT_SYSTEMS 64

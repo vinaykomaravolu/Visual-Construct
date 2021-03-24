@@ -3,7 +3,7 @@
 
 namespace VisualConstruct
 {
-	class Physics
+	/*class Physics
 	{
 	public:
 		Physics();
@@ -22,5 +22,5 @@ namespace VisualConstruct
 		btAlignedObjectArray<btCollisionShape*> collisionShapes;
 
 		btScalar defaultTimeStep = 1.f / 60.f;
-	};
+	};*/
 }
