@@ -8,55 +8,26 @@ using namespace VisualConstruct;
 
 int main()
 {
-    // Vulkan Test
-    uint32_t extensionCount = 0;
-    if (vkEnumerateInstanceExtensionProperties(nullptr, &extensionCount, nullptr) != VK_SUCCESS)
-    {
-        VC_LOG_VULKAN_ERROR("Vulkan Test: Failed");
-        return 0;
-    }
-    VC_LOG_VULKAN_INFO("Vulkan Test: Pass");
-
-    // GLM Test
-    glm::mat4 matrix;
-    glm::vec4 vec;
-    auto test = matrix * vec;
-    VC_LOG_CORE_INFO("GLM Test: Pass");
 
     // GLFW Test
     if (!glfwInit())
     {
-        VC_LOG_CLIENT_ERROR("GLFW Test: Failed");
+        VC_LOG_CLIENT_ERROR("GLFW Init: Failed");
         return 0;
     }
-    VC_LOG_CORE_INFO("GLFW Test: Pass");
+    VC_LOG_CORE_INFO("GLFW Init: Pass");
 
     GLFWwindow *window = glfwCreateWindow(1920, 1080, "Visual Construct", nullptr, nullptr);
-
     glfwMakeContextCurrent(window);
     glfwSwapInterval(1); // Enable vsync
 
-    // Glad Test
-    if (!gladLoadGL())
-    {
-        VC_LOG_OPENGL_ERROR("GLAD Test: Failed");
-        return 0;
-    }
-    VC_LOG_OPENGL_INFO("GLAD Test: Pass");
-
-    // IMGUI Test
-    if (!IMGUI_CHECKVERSION())
-    {
-        VC_LOG_CLIENT_ERROR("Imgui Test: Failed");
-        return 0;
-    }
     ImGui::CreateContext();
     ImGuiIO &io = ImGui::GetIO();
     (void)io;
     ImGui::StyleColorsDark();
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
-    VC_LOG_CLIENT_INFO("Imgui Test: Pass");
+    VC_LOG_CLIENT_INFO("Imgui Init");
 
     // Our state
     bool show_demo_window = true;

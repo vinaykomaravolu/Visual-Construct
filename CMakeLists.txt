@@ -61,8 +61,8 @@ set_property(TARGET ${PROJECT_NAME}_lib PROPERTY CXX_STANDARD 17)
 set(GLAD_DIR ${PROJECT_SOURCE_DIR}/dep/glad)
 add_library(glad ${GLAD_DIR}/src/glad.c)
 target_include_directories(glad PRIVATE ${GLAD_DIR}/include)
-target_include_directories(${PROJECT_NAME} PRIVATE ${GLAD_DIR}/include)
-target_include_directories(${PROJECT_NAME}_lib PRIVATE ${GLAD_DIR}/include)
+target_include_directories(${PROJECT_NAME} PUBLIC ${GLAD_DIR}/include)
+target_include_directories(${PROJECT_NAME}_lib PUBLIC ${GLAD_DIR}/include)
 
 # Vulkan
 find_library(VULKAN_LIB vulkan-1.lib PATHS ${PROJECT_SOURCE_DIR}/dep/vulkan/lib)

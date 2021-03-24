@@ -25,6 +25,5 @@ using Signature = std::bitset<MAX_COMPONENT_SYSTEMS>;
 
 struct Entity
 {
-	uint32_t id;
+    uint32_t id;
 };
-
